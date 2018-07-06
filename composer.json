@@ -1,0 +1,26 @@
+{
+  "name": "dcg/dcg-lib-membership-number-client",
+  "description": "Client for DCG Membership Number Service",
+  "type": "library",
+  "require": {
+    "php": "^5.6|^7.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0",
+    "mockery/mockery": "~0.8",
+    "guzzlehttp/guzzle": "~5.0"
+  },
+  "suggest": {
+    "guzzlehttp/guzzle": "Allows for implementation of the Guzzle HTTP client"
+  },
+  "autoload": {
+    "psr-4": {
+      "Dcg\\Client\\MembershipNumberClient\\": "src/MembershipNumberClient"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Dcg\\Client\\MembershipNumberClient\\Tests\\": "tests/"
+    }
+  }
+}
