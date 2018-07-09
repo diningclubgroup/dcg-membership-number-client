@@ -12,4 +12,24 @@ class ClientTest extends TestCase
         //Dummy test
         $this->assertInstanceOf(Client::class, $client);
     }
+
+    public function testClientIsValidIdentifier()
+    {
+
+    }
+
+    public function testClientIsNotValidIdentifier()
+    {
+
+    }
+
+    public function testClientGetNewMembershipNumber()
+    {
+
+    }
+
+    public function testClientServiceNotAvailable()
+    {
+
+    }
 }
