@@ -16,9 +16,14 @@ class Client extends ApiClient
     private $validClientIdentifiers = ['TC','GS'];
 
     /**
-     * Api endpoint
+     * Api endpoint for getting new membership number
      */
-    const API_URL = 'http://192.168.33.13:8080/v1/numbers/number';
+    const NEW_MEMBERSHIP_NUMBER_URL = 'http://192.168.33.13:8080/v1/numbers/number';
+
+    /**
+     * Api endpoint for storing membership numbers
+     */
+    const STORE_MEMBERSHIP_NUMBER_URL = 'http://192.168.33.13:8080/v1/numbers';
 
     /**
      * Returns a new unused membership number
@@ -35,13 +40,48 @@ class Client extends ApiClient
 
         try {
             $response = $this->post(
-                self::API_URL,
+                self::NEW_MEMBERSHIP_NUMBER_URL,
                 $options
             );
 
             $result = json_decode($response->getBody(), true);
 
             return $result['membership_number'];
+
+        } catch (BadResponseException $e) {
+
+            throw new MembershipNumberException($this->getErrorMessage($e));
+        }
+    }
+
+    /**
+     * Stores a batch of membership numbers
+     *
+     * @param array $membershipNumbers Membership numbers to store in the following format,
+     *
+     * [
+     *  ['membership_number' => ''XXXXXX', 'brand' => 'TC'],
+     *  ['membership_number' => 'YYYYYYY', 'brand' => 'GS']
+     *  ...
+     *  ...
+     * ]
+     *
+     * @return bool
+     * @throws MembershipNumberException
+     */
+    public function store(array $membershipNumbers)
+    {
+        if (!$this->isValid($membershipNumbers)) {
+            throw new MembershipNumberException('Invalid data passed into store');
+        }
+
+        try {
+            $response = $this->post(
+                self::STORE_MEMBERSHIP_NUMBER_URL,
+                ['body' => json_encode($membershipNumbers)]
+            );
+
+            return $response->getStatusCode() == 200;
 
         } catch (BadResponseException $e) {
 
@@ -75,5 +115,17 @@ class Client extends ApiClient
         $errorMessage.= ". Response code : " . $responseCode;
 
         return $errorMessage;
+    }
+
+    private function isValid(array $membershipNumbers)
+    {
+        foreach ($membershipNumbers as $item) {
+            if (!isset($item['membership_number']) || !isset($item['brand'])) {
+
+                return false;
+            }
+        }
+
+        return true;
     }
 }

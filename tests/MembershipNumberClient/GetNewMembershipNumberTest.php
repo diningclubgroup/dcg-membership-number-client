@@ -7,18 +7,8 @@ use GuzzleHttp\Stream\Stream;
 use GuzzleHttp\Subscriber\Mock;
 use PHPUnit\Framework\TestCase;
 
-class ClientTest extends TestCase
+class GetNewMembershipNumberTest extends TestCase
 {
-    public function testClientIsValidIdentifier()
-    {
-
-    }
-
-    public function testClientIsNotValidIdentifier()
-    {
-
-    }
-
     /**
      * @test
      */
