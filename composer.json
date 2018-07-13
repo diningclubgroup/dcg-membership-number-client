@@ -15,12 +15,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Dcg\\Client\\MembershipNumberClient\\": "src/MembershipNumberClient"
+      "Dcg\\Client\\MembershipNumber\\": "src/MembershipNumber"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Dcg\\Client\\MembershipNumberClient\\Tests\\": "tests/"
+      "Dcg\\Client\\MembershipNumber\\Tests\\": "tests/"
     }
   }
 }

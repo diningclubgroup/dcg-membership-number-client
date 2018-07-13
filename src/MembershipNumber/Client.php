@@ -1,8 +1,8 @@
 <?php
 
-namespace Dcg\Client\MembershipNumberClient;
+namespace Dcg\Client\MembershipNumber;
 
-use Dcg\Client\MembershipNumberClient\Exception\MembershipNumberException;
+use Dcg\Client\MembershipNumber\Exception\MembershipNumberException;
 use GuzzleHttp\Client as ApiClient;
 use GuzzleHttp\Exception\BadResponseException;
 

@@ -1,7 +1,7 @@
 <?php
 
-use Dcg\Client\MembershipNumberClient\Client;
-use Dcg\Client\MembershipNumberClient\Exception\MembershipNumberException;
+use Dcg\Client\MembershipNumber\Client;
+use Dcg\Client\MembershipNumber\Exception\MembershipNumberException;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
 use GuzzleHttp\Subscriber\Mock;
