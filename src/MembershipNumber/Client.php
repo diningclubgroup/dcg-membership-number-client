@@ -14,7 +14,9 @@ class Client extends ApiClient
 	 */
 	protected $config;
 
-	public function __construct() {
+	public function __construct(array $config = [])
+	{
+		parent::__construct($config);
 
 		$this->config = Config::getInstance();
 	}
