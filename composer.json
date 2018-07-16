@@ -3,8 +3,7 @@
   "description": "Client for DCG Membership Number Service",
   "type": "library",
   "require": {
-    "php": "^5.5|^7.0",
-    "guzzlehttp/guzzle": "~5.0"
+    "guzzlehttp/guzzle": "^5.3"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0",

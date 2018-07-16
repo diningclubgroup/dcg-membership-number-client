@@ -1,7 +1,6 @@
 <?php
 
 use Dcg\Client\MembershipNumber\Client;
-use Dcg\Client\MembershipNumber\Exception\MembershipNumberException;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
 use GuzzleHttp\Subscriber\Mock;
@@ -38,7 +37,7 @@ class GetNewMembershipNumberTest extends TestCase
 
         $client->getEmitter()->attach($mock);
 
-        $this->setExpectedException(MembershipNumberException::class, 'Unable to allocate membership number');
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Unable to allocate membership number');
 
         $client->getNewMembershipNumber('TC');
     }
@@ -56,7 +55,7 @@ class GetNewMembershipNumberTest extends TestCase
 
         $client->getEmitter()->attach($mock);
 
-        $this->setExpectedException(MembershipNumberException::class, 'Brand is missing');
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Brand is missing');
 
         $client->getNewMembershipNumber('');
     }
@@ -74,7 +73,7 @@ class GetNewMembershipNumberTest extends TestCase
 
         $client->getEmitter()->attach($mock);
 
-        $this->setExpectedException(MembershipNumberException::class, 'There was an error while contacting Membership Number Service. Response code : 500');
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'There was an error while contacting Membership Number Service. Response code : 500');
 
         $client->getNewMembershipNumber('TC');
     }

@@ -45,19 +45,6 @@ class Client extends ApiClient
      */
     public function getNewMembershipNumber($brand)
     {
-        /**
-         * Mocking the response for now until the API end point is up and running somewhere
-         *
-         * @TODO Remove start
-         */
-
-        srand();
-        return (time()*time())/rand(1,time());
-
-        /**
-         * @TODO Remove end
-         */
-
         $options = [
             'headers' => ['Brand' => $brand]
         ];

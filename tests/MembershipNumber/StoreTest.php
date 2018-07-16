@@ -1,7 +1,6 @@
 <?php
 
 use Dcg\Client\MembershipNumber\Client;
-use Dcg\Client\MembershipNumber\Exception\MembershipNumberException;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
 use GuzzleHttp\Subscriber\Mock;
@@ -35,7 +34,7 @@ class StoreTest extends TestCase
      */
     public function does_client_throw_exception_for_invalid_input()
     {
-        $this->setExpectedException(MembershipNumberException::class, 'Invalid data passed into store');
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Invalid data passed into store');
         $client = new Client();
 
         $toCreate = [
@@ -59,7 +58,7 @@ class StoreTest extends TestCase
 
         $client->getEmitter()->attach($mock);
 
-        $this->setExpectedException(MembershipNumberException::class, 'Unable to store membership numbers');
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Unable to store membership numbers');
 
         $toCreate = [
             ['membership_number' => '888888', 'brand' => 'TC'],
