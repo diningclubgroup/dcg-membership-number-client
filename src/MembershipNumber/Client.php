@@ -18,12 +18,12 @@ class Client extends ApiClient
     /**
      * Api endpoint for getting new membership number
      */
-    const NEW_MEMBERSHIP_NUMBER_URL = 'http://192.168.33.13:8080/v1/numbers/number';
+    const NEW_MEMBERSHIP_NUMBER_URL = 'https://member-num.test.diningclubgroup.com/v1/numbers/number';
 
     /**
      * Api endpoint for storing membership numbers
      */
-    const STORE_MEMBERSHIP_NUMBER_URL = 'http://192.168.33.13:8080/v1/numbers';
+    const STORE_MEMBERSHIP_NUMBER_URL = 'https://member-num.test.diningclubgroup.com/v1/numbers';
 
     /**
      * Returns a new unused membership number
@@ -34,19 +34,6 @@ class Client extends ApiClient
      */
     public function getNewMembershipNumber($brand)
     {
-        /**
-         * Mocking the response for now until the API end point is up and running somewhere
-         *
-         * @TODO Remove start
-         */
-
-        srand();
-        return (time()*time())/rand(1,time());
-
-        /**
-         * @TODO Remove end
-         */
-
         $options = [
             'headers' => ['Brand' => $brand]
         ];
