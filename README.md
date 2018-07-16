@@ -20,4 +20,14 @@ To add this library to an existing application,
 ```javascript
 "dcg/dcg-lib-membership-number-client": "dev-master"
 ```    
+
+* Add this to the scripts section: 
+```json
+"scripts": {
+    "post-update-cmd": [
+        "Dcg\\Client\\MembershipNumber\\Config\\FileCreator::createConfigFile"        
+    ]
+}
+```
+
 * Run composer install
