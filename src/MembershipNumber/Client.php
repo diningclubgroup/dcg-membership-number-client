@@ -2,12 +2,23 @@
 
 namespace Dcg\Client\MembershipNumber;
 
+use Dcg\Client\MembershipNumber\Config\Config;
 use Dcg\Client\MembershipNumber\Exception\MembershipNumberException;
 use GuzzleHttp\Client as ApiClient;
 use GuzzleHttp\Exception\BadResponseException;
 
 class Client extends ApiClient
 {
+	/**
+	 * @var Config
+	 */
+	protected $config;
+
+	public function __construct() {
+
+		$this->config = Config::getInstance();
+	}
+
     /**
      * Default error message for api failures
      */
@@ -18,12 +29,12 @@ class Client extends ApiClient
     /**
      * Api endpoint for getting new membership number
      */
-    const NEW_MEMBERSHIP_NUMBER_URL = 'http://192.168.33.13:8080/v1/numbers/number';
+    const NEW_MEMBERSHIP_NUMBER_URL = '/numbers/number';
 
     /**
      * Api endpoint for storing membership numbers
      */
-    const STORE_MEMBERSHIP_NUMBER_URL = 'http://192.168.33.13:8080/v1/numbers';
+    const STORE_MEMBERSHIP_NUMBER_URL = '/numbers';
 
     /**
      * Returns a new unused membership number
@@ -53,7 +64,7 @@ class Client extends ApiClient
 
         try {
             $response = $this->post(
-                self::NEW_MEMBERSHIP_NUMBER_URL,
+				$this->config->get('api_base_url').self::NEW_MEMBERSHIP_NUMBER_URL,
                 $options
             );
 
@@ -90,7 +101,7 @@ class Client extends ApiClient
 
         try {
             $response = $this->post(
-                self::STORE_MEMBERSHIP_NUMBER_URL,
+				$this->config->get('api_base_url').self::STORE_MEMBERSHIP_NUMBER_URL,
                 ['body' => json_encode($membershipNumbers)]
             );
 
