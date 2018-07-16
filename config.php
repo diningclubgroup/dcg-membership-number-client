@@ -1,5 +1,5 @@
 <?php
 
 return [
-	'api_base_url' => 'http://192.168.33.13:8080/v1'
+	'api_base_url' => 'https://member-num.test.diningclubgroup.com/v1'
 ];
