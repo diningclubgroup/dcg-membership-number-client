@@ -3,6 +3,7 @@
 namespace Dcg\Client\MembershipNumber;
 
 use Dcg\Client\MembershipNumber\Config\Config;
+use Dcg\Client\MembershipNumber\Exception\ConfigValueNotFoundException;
 use Dcg\Client\MembershipNumber\Exception\MembershipNumberException;
 use GuzzleHttp\Client as ApiClient;
 use GuzzleHttp\Exception\BadResponseException;
@@ -44,6 +45,7 @@ class Client extends ApiClient
      * @param string $brand Brand the membership number is requested for (TS, GS etc.)
      * @return string Membership number
      * @throws MembershipNumberException for any errors. Error messages from the api is available in the exception.
+     * @throws ConfigValueNotFoundException
      */
     public function getNewMembershipNumber($brand)
     {
@@ -81,6 +83,7 @@ class Client extends ApiClient
      *
      * @return bool
      * @throws MembershipNumberException
+     * @throws ConfigValueNotFoundException
      */
     public function store(array $membershipNumbers)
     {

@@ -16,15 +16,16 @@ class Config {
 	 */
 	protected static $instance = null;
 
-	/**
-	 * singleton: return self
-	 *
-	 * @param string $configFile  (Optional) The absolute filename of the config file
-	 * @return self
-	 */
+    /**
+     * singleton: return self
+     *
+     * @param string $configFile (Optional) The absolute filename of the config file
+     * @return self
+     * @throws ConfigFileNotFoundException
+     */
 	public static function getInstance($configFile = null) {
 
-		$configFile = $configFile ?: (self::getRootDir() ? self::getRootDir().'/config/membership-number-client.php' : '');
+		$configFile = $configFile ?: (self::getRootDir() ? self::getRootDir().'/config/membership-number-client.php' : __DIR__.'/../../../config.php');
 
 		if (is_null(self::$instance)) {
 			self::setInstance();
@@ -42,11 +43,12 @@ class Config {
 		self::$instance = new self();
 	}
 
-	/**
-	 *  Get values from config file
-	 *
-	 * @param string $configFile
-	 */
+    /**
+     *  Get values from config file
+     *
+     * @param string $configFile
+     * @throws ConfigFileNotFoundException
+     */
 	private static function init ($configFile)
 	{
 		self::configFileToArray($configFile);
