@@ -2,7 +2,7 @@
 
 namespace Dcg\Client\MembershipNumber;
 
-use Dcg\Client\MembershipNumber\Config\Config;
+use Dcg\Client\MembershipNumber\Config;
 use Dcg\Client\MembershipNumber\Exception\ConfigValueNotFoundException;
 use Dcg\Client\MembershipNumber\Exception\MembershipNumberException;
 use GuzzleHttp\Client as ApiClient;
