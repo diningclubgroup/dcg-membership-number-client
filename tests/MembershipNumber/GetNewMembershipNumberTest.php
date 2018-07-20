@@ -1,6 +1,7 @@
 <?php
 
 use Dcg\Client\MembershipNumber\Client;
+use Dcg\Client\MembershipNumber\Config;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
 use GuzzleHttp\Subscriber\History;
@@ -27,7 +28,7 @@ class GetNewMembershipNumberTest extends TestCase
             new Response(200, [], Stream::factory(json_encode(['membership_number' => '1234567'])))
         ]);
 
-        $client = new Client();
+        $client = new Client([], $this->config);
 
         $client->getEmitter()->attach($mock);
 
@@ -42,7 +43,7 @@ class GetNewMembershipNumberTest extends TestCase
 
         $history = new History();
 
-        $client = new Client();
+        $client = new Client([], $this->config);
 
         $client->getEmitter()->attach($mock);
         $client->getEmitter()->attach($history);
@@ -63,7 +64,7 @@ class GetNewMembershipNumberTest extends TestCase
             new Response(404, [], Stream::factory(json_encode(['error' => 'Unable to allocate membership number'])))
         ]);
 
-        $client = new Client();
+        $client = new Client([], $this->config);
 
         $client->getEmitter()->attach($mock);
 
@@ -81,7 +82,7 @@ class GetNewMembershipNumberTest extends TestCase
             new Response(500)
         ]);
 
-        $client = new Client();
+        $client = new Client([], $this->config);
 
         $client->getEmitter()->attach($mock);
 
