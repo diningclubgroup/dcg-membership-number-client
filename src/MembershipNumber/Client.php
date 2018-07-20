@@ -27,11 +27,18 @@ class Client extends ApiClient
      */
     protected $headers = [];
 
-	public function __construct(array $config = [])
+    /**
+     * Client constructor.
+     * @param array $apiClientConfig (Optional)   The config for the http client
+     * @param \Dcg\Config (Optional) $membershipNumberClientConfig    The config for the membership number client
+     * @throws \Dcg\Config\Exception\ConfigFileNotFoundException
+     * @throws \Dcg\Config\Exception\ConfigValueNotFoundException
+     */
+	public function __construct(array $apiClientConfig = [], \Dcg\Client\MembershipNumber\Config $membershipNumberClientConfig = null)
 	{
-		parent::__construct($config);
+		parent::__construct($apiClientConfig);
 
-		$this->config = Config::getInstance();
+		$this->config = $membershipNumberClientConfig ?: Config::getInstance();
 		$this->headers['Access-Token'] = $this->config->get('api_access_token');
 	}
 
