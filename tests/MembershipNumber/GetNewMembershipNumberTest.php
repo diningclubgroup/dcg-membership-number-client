@@ -1,6 +1,7 @@
 <?php
 
 use Dcg\Client\MembershipNumber\Client;
+use Dcg\Client\MembershipNumber\Config;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
 use GuzzleHttp\Subscriber\History;
@@ -9,6 +10,15 @@ use PHPUnit\Framework\TestCase;
 
 class GetNewMembershipNumberTest extends TestCase
 {
+    private $config;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->config = Config::getInstance(__DIR__.'/../../config.php');
+    }
+
     /**
      * @test
      */
