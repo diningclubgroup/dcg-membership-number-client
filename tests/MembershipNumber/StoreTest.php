@@ -1,6 +1,7 @@
 <?php
 
 use Dcg\Client\MembershipNumber\Client;
+use Dcg\Client\MembershipNumber\Config;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
 use GuzzleHttp\Subscriber\Mock;
@@ -8,6 +9,16 @@ use PHPUnit\Framework\TestCase;
 
 class StoreTest extends TestCase
 {
+
+    protected $config = null;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->config = Config::getInstance(__DIR__.'/../../config.php');
+    }
+
     /**
      * @test
      */
@@ -17,7 +28,7 @@ class StoreTest extends TestCase
             new Response(200, [], Stream::factory(json_encode([['message' => 'Success']])))
         ]);
 
-        $client = new Client();
+        $client = new Client([], $this->config);
 
         $client->getEmitter()->attach($mock);
 
@@ -35,7 +46,7 @@ class StoreTest extends TestCase
     public function does_client_throw_exception_for_invalid_input()
     {
         $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Invalid data passed into store');
-        $client = new Client();
+        $client = new Client([], $this->config);
 
         $toCreate = [
             ['membership_number' => '888888', 'brand' => 'TC'],
@@ -54,7 +65,7 @@ class StoreTest extends TestCase
             new Response(404, [], Stream::factory(json_encode(['error' => 'Unable to store membership numbers'])))
         ]);
 
-        $client = new Client();
+        $client = new Client([], $this->config);
 
         $client->getEmitter()->attach($mock);
 

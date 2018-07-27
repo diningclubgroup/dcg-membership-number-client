@@ -2,7 +2,7 @@
 
 namespace Dcg\Client\MembershipNumber;
 
-use Dcg\Client\MembershipNumber\Config\Config;
+use Dcg\Client\MembershipNumber\Config;
 use Dcg\Client\MembershipNumber\Exception\ConfigValueNotFoundException;
 use Dcg\Client\MembershipNumber\Exception\MembershipNumberException;
 use GuzzleHttp\Client as ApiClient;
@@ -15,19 +15,37 @@ class Client extends ApiClient
 	 */
 	protected $config;
 
-	public function __construct(array $config = [])
-	{
-		parent::__construct($config);
+    /**
+     * The default headers to use for any requests
+     * @var array
+     */
+    protected $defaultHeaders = [];
 
-		$this->config = Config::getInstance();
+    /**
+     * The headers to use for any requests. Overwrites default headers.
+     * @var array
+     */
+    protected $headers = [];
+
+    /**
+     * Client constructor.
+     * @param array $apiClientConfig (Optional)   The config for the http client
+     * @param \Dcg\Config (Optional) $membershipNumberClientConfig    The config for the membership number client
+     * @throws \Dcg\Config\Exception\ConfigFileNotFoundException
+     * @throws \Dcg\Config\Exception\ConfigValueNotFoundException
+     */
+	public function __construct(array $apiClientConfig = [], \Dcg\Client\MembershipNumber\Config $membershipNumberClientConfig = null)
+	{
+		parent::__construct($apiClientConfig);
+
+		$this->config = $membershipNumberClientConfig ?: Config::getInstance();
+		$this->headers['Access-Token'] = $this->config->get('api_access_token');
 	}
 
     /**
      * Default error message for api failures
      */
     const DEFAULT_ERROR_MESSAGE = 'There was an error while contacting Membership Number Service';
-
-    private $validClientIdentifiers = ['TC','GS'];
 
     /**
      * Api endpoint for getting new membership number
@@ -42,15 +60,14 @@ class Client extends ApiClient
     /**
      * Returns a new unused membership number
      *
-     * @param string $brand Brand the membership number is requested for (TS, GS etc.)
      * @return string Membership number
      * @throws MembershipNumberException for any errors. Error messages from the api is available in the exception.
      * @throws ConfigValueNotFoundException
      */
-    public function getNewMembershipNumber($brand)
+    public function getNewMembershipNumber()
     {
         $options = [
-            'headers' => ['Brand' => $brand]
+            'headers' => $this->getHeaders()
         ];
 
         try {
@@ -105,11 +122,6 @@ class Client extends ApiClient
         }
     }
 
-    private function isValidClient($clientIdentifier)
-    {
-        return in_array($clientIdentifier, $this->validClientIdentifiers);
-    }
-
     /**
      * Retrieves error message from the Guzzle exception
      *
@@ -143,5 +155,25 @@ class Client extends ApiClient
         }
 
         return true;
+    }
+
+    /**
+     * Get the headers to use for requests
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return array_merge($this->defaultHeaders, $this->headers);
+    }
+
+    /**
+     * Set the headers to use for requests. Replaces existing headers and if a default header exists with the same
+     * name it will be overwritten.
+     *
+     * @param array $headers Key-Value array of headers to set.
+     */
+    public function setHeaders($headers)
+    {
+        $this->headers = $headers;
     }
 }
