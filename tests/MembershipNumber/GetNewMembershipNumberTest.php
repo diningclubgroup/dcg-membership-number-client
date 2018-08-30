@@ -10,13 +10,15 @@ use PHPUnit\Framework\TestCase;
 
 class GetNewMembershipNumberTest extends TestCase
 {
-    private $config;
+    private $testConfig;
+    private $prodConfig;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->config = Config::getInstance(__DIR__.'/../../config.php');
+        $this->prodConfig = Config::getInstance(__DIR__.'/../../config.php');
+        $this->testConfig = Config::getInstance(__DIR__.'/../../config.php', \Dcg\Config::ENV_TEST);
     }
 
     /**
@@ -28,7 +30,7 @@ class GetNewMembershipNumberTest extends TestCase
             new Response(200, [], Stream::factory(json_encode(['membership_number' => '1234567'])))
         ]);
 
-        $client = new Client([], $this->config);
+        $client = new Client([], $this->testConfig);
 
         $client->getEmitter()->attach($mock);
 
@@ -43,7 +45,7 @@ class GetNewMembershipNumberTest extends TestCase
 
         $history = new History();
 
-        $client = new Client([], $this->config);
+        $client = new Client([], $this->testConfig);
 
         $client->getEmitter()->attach($mock);
         $client->getEmitter()->attach($history);
@@ -64,7 +66,7 @@ class GetNewMembershipNumberTest extends TestCase
             new Response(404, [], Stream::factory(json_encode(['error' => 'Unable to allocate membership number'])))
         ]);
 
-        $client = new Client([], $this->config);
+        $client = new Client([], $this->testConfig);
 
         $client->getEmitter()->attach($mock);
 
@@ -82,12 +84,30 @@ class GetNewMembershipNumberTest extends TestCase
             new Response(500)
         ]);
 
-        $client = new Client([], $this->config);
+        $client = new Client([], $this->testConfig);
 
         $client->getEmitter()->attach($mock);
 
         $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'There was an error while contacting Membership Number Service. Response code : 500');
 
         $client->getNewMembershipNumber();
+    }
+
+    /**
+     * @test
+     */
+    public function gets_test_config() {
+        $client = new Client([], $this->testConfig);
+        $headers = $client->getHeaders();
+        $this->assertEquals($headers['Access-Token'], 'TEST_TOKEN');
+    }
+
+    /**
+     * @test
+     */
+    public function gets_prod_config() {
+        $client = new Client([], $this->prodConfig);
+        $headers = $client->getHeaders();
+        $this->assertEquals($headers['Access-Token'], 'PROD_TOKEN');
     }
 }
