@@ -5,12 +5,12 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://git@bitbucket.org/tastecard/dcg-lib-config.git"
+      "url": "git@bitbucket.org:tastecard/dcg-lib-config.git"
     }
   ],
   "require": {
     "guzzlehttp/guzzle": "^5.3",
-    "dcg/dcg-lib-config": "dev-AT-710-env-config"
+    "dcg/dcg-lib-config": "dev-master"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0",
