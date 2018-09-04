@@ -7,13 +7,14 @@ use Dcg\Client\MembershipNumber\Exception\ConfigValueNotFoundException;
 use Dcg\Client\MembershipNumber\Exception\MembershipNumberException;
 use GuzzleHttp\Client as ApiClient;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ClientException;
 
 class Client extends ApiClient
 {
-	/**
-	 * @var Config
-	 */
-	protected $config;
+    /**
+     * @var Config
+     */
+    protected $config;
 
     /**
      * The default headers to use for any requests
@@ -34,13 +35,13 @@ class Client extends ApiClient
      * @throws \Dcg\Config\Exception\ConfigFileNotFoundException
      * @throws \Dcg\Config\Exception\ConfigValueNotFoundException
      */
-	public function __construct(array $apiClientConfig = [], \Dcg\Client\MembershipNumber\Config $membershipNumberClientConfig = null)
-	{
-		parent::__construct($apiClientConfig);
+    public function __construct(array $apiClientConfig = [], \Dcg\Client\MembershipNumber\Config $membershipNumberClientConfig = null)
+    {
+        parent::__construct($apiClientConfig);
 
-		$this->config = $membershipNumberClientConfig ?: Config::getInstance();
-		$this->headers['Access-Token'] = $this->config->get('api_access_token');
-	}
+        $this->config = $membershipNumberClientConfig ?: Config::getInstance();
+        $this->headers['Access-Token'] = $this->config->get('api_access_token');
+    }
 
     /**
      * Default error message for api failures
@@ -70,20 +71,45 @@ class Client extends ApiClient
             'headers' => $this->getHeaders()
         ];
 
-        try {
-            $response = $this->post(
-				$this->config->get('api_base_url').self::NEW_MEMBERSHIP_NUMBER_URL,
-                $options
-            );
+        $membershipNumber = null;
+        $attempt = 0;
+        $tries = 3;
+        $errors = [];
 
-            $result = json_decode($response->getBody(), true);
+        do {
 
-            return $result['membership_number'];
+            try {
+                $response = $this->post(
+                    $this->config->get('api_base_url') . self::NEW_MEMBERSHIP_NUMBER_URL,
+                    $options
+                );
 
-        } catch (BadResponseException $e) {
+                $result = json_decode($response->getBody(), true);
 
-            throw new MembershipNumberException($this->getErrorMessage($e));
+                $membershipNumber = $result['membership_number'];
+
+            } catch (ClientException $e) {
+                // dont't retry for client exceptions
+                $errors[] = $this->getErrorMessage($e);
+                break;
+            } catch (\Exception $e) {
+                $errors[] = $e->getMessage();
+            }
+
+            $attempt++;
+
+        } while (!$membershipNumber && ($attempt < $tries));
+
+        if (!$membershipNumber) {
+            // still no membership number, throw exception
+            $error = 'Unable to get a membership number';
+            if ($errors) {
+                $error .= '. '.implode('; ', $errors);
+            }
+            throw new MembershipNumberException($error);
         }
+
+        return $membershipNumber;
     }
 
     /**
@@ -110,7 +136,7 @@ class Client extends ApiClient
 
         try {
             $response = $this->post(
-				$this->config->get('api_base_url').self::STORE_MEMBERSHIP_NUMBER_URL,
+                $this->config->get('api_base_url').self::STORE_MEMBERSHIP_NUMBER_URL,
                 ['body' => json_encode($membershipNumbers)]
             );
 

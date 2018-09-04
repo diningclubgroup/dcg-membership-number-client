@@ -5,7 +5,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://git@bitbucket.org/tastecard/dcg-lib-config.git"
+      "url": "git@bitbucket.org:tastecard/dcg-lib-config.git"
     }
   ],
   "require": {
