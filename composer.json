@@ -9,7 +9,7 @@
     }
   ],
   "require": {
-    "guzzlehttp/guzzle": "^5.3",
+    "guzzlehttp/guzzle": "^6.3",
     "dcg/dcg-lib-config": "dev-master"
   },
   "require-dev": {
