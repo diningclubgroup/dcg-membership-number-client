@@ -88,7 +88,7 @@ class GetNewMembershipNumberTest extends TestCase
 
         $client->getEmitter()->attach($mock);
 
-        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'There was an error while contacting Membership Number Service. Response code : 500');
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException');
 
         $client->getNewMembershipNumber();
     }
