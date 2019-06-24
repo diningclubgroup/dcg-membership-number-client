@@ -2,16 +2,10 @@
   "name": "dcg/dcg-membership-number-client",
   "description": "Client for DCG Membership Number Service",
   "type": "library",
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "git@bitbucket.org:tastecard/dcg-lib-config.git"
-    }
-  ],
   "require": {
     "php": ">=5.4",
     "guzzlehttp/guzzle": "^5.3",
-    "dcg/dcg-lib-config": "dev-master"
+    "dcg/dcg-membership-number-config": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0",
