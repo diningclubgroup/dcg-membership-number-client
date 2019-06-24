@@ -2,9 +2,10 @@
   "name": "dcg/dcg-membership-number-client",
   "description": "Client for DCG Membership Number Service",
   "type": "library",
+  "license": "proprietary",
   "require": {
-    "php": ">=5.4",
-    "guzzlehttp/guzzle": "^5.3",
+    "php": ">=5.5",
+    "guzzlehttp/guzzle": "^6.3",
     "dcg/dcg-membership-number-config": "^1.0"
   },
   "require-dev": {
