@@ -99,6 +99,35 @@ class GetNewBulkMembershipNumberTest extends TestCase
     /**
      * @test
      */
+    public function does_client_handle_422_error()
+    {
+        $mock = new Mock([
+            new Response(422)
+        ]);
+
+        $client = new Client([], $this->testConfig);
+
+        $client->getEmitter()->attach($mock);
+
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Limit should contain valid integer. Response code : 422');
+
+        $limit = ['limit' => -1];
+        $client->getNewBulkMembershipNumber($limit);
+
+        $limit = ['limit' => 0];
+        $client->getNewBulkMembershipNumber($limit);
+
+        $limit = ['limit' => null];
+        $client->getNewBulkMembershipNumber($limit);
+
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Limit is null. Response code : 422');
+        $limit = [];
+        $client->getNewBulkMembershipNumber($limit);
+    }
+
+    /**
+     * @test
+     */
     public function gets_test_config() {
         $client = new Client([], $this->testConfig);
         $headers = $client->getHeaders();
