@@ -5,7 +5,6 @@ use Dcg\Client\MembershipNumber\Config;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Stream\Stream;
 use PHPUnit\Framework\TestCase;
 
 class StoreTest extends TestCase
@@ -26,7 +25,7 @@ class StoreTest extends TestCase
     public function does_client_return_success()
     {
         $mock = new MockHandler([
-            new Response(200, [], Stream::factory(json_encode([['message' => 'Success']])))
+            new Response(200, [], json_encode([['message' => 'Success']]))
         ]);
         $handler = HandlerStack::create($mock);
 
@@ -65,7 +64,7 @@ class StoreTest extends TestCase
     public function does_client_handle_500_error()
     {
         $mock = new MockHandler([
-            new Response(404, [], Stream::factory(json_encode(['error' => 'Unable to store membership numbers'])))
+            new Response(404, [], json_encode(['error' => 'Unable to store membership numbers']))
         ]);
         $handler = HandlerStack::create($mock);
 

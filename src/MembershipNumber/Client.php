@@ -54,6 +54,11 @@ class Client extends ApiClient
     const NEW_MEMBERSHIP_NUMBER_URL = '/numbers/number';
 
     /**
+     * Api endpoint for getting new bulk membership numbers
+     */
+    const NEW_BULK_MEMBERSHIP_NUMBER_URL = '/numbers/bulkNumbers';
+
+    /**
      * Api endpoint for storing membership numbers
      */
     const STORE_MEMBERSHIP_NUMBER_URL = '/numbers';
@@ -87,6 +92,63 @@ class Client extends ApiClient
                 $result = json_decode($response->getBody(), true);
 
                 $membershipNumber = $result['membership_number'];
+
+            } catch (ClientException $e) {
+                // dont't retry for client exceptions
+                $errors[] = $this->getErrorMessage($e);
+                break;
+            } catch (\Exception $e) {
+                $errors[] = $e->getMessage();
+            }
+
+            $attempt++;
+
+        } while (!$membershipNumber && ($attempt < $tries));
+
+        if (!$membershipNumber) {
+            // still no membership number, throw exception
+            $error = 'Unable to get a membership number';
+            if ($errors) {
+                $error .= '. '.implode('; ', $errors);
+            }
+            throw new MembershipNumberException($error);
+        }
+
+        return $membershipNumber;
+    }
+
+    /**
+     * Returns an aray of new unused membership numbers
+     *
+     * @param  array limit
+     * @return array Membership numbers
+     * @throws MembershipNumberException for any errors. Error messages from the api is available in the exception.
+     * @throws ConfigValueNotFoundException
+     */
+    public function getNewBulkMembershipNumber(array $limit)
+    {
+
+        $options = [
+            'headers' => $this->getHeaders(),
+            'body' => json_encode($limit)
+        ];
+
+        $membershipNumber = [];
+        $attempt = 0;
+        $tries = 3;
+        $errors = [];
+
+        do {
+
+            try { 
+                $response = $this->post(
+                    $this->config->get('api_base_url') . self::NEW_BULK_MEMBERSHIP_NUMBER_URL,
+                    $options
+                );
+
+                $result = json_decode($response->getBody(), true);
+
+                $membershipNumber = $result;
 
             } catch (ClientException $e) {
                 // dont't retry for client exceptions

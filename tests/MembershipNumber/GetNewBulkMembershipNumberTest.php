@@ -8,7 +8,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
-class GetNewMembershipNumberTest extends TestCase
+class GetNewBulkMembershipNumberTest extends TestCase
 {
     private $testConfig;
     private $prodConfig;
@@ -24,16 +24,18 @@ class GetNewMembershipNumberTest extends TestCase
     /**
      * @test
      */
-    public function does_client_return_membership_number()
+    public function does_client_return_membership_numbers()
     {
+        $membershipNumbers = ['1234567'];
         $mock = new MockHandler([
-            new Response(200, [], json_encode(['membership_number' => '1234567']))
+            new Response(200, [], json_encode($membershipNumbers))
         ]);
         $handler = HandlerStack::create($mock);
 
         $client = new Client(['handler' => $handler], $this->testConfig);
 
-        $this->assertEquals('1234567', $client->getNewMembershipNumber());
+        $payload = ['limit' => 1];
+        $this->assertEquals($membershipNumbers, $client->getNewBulkMembershipNumber($payload));
     }
 
     /**
@@ -41,8 +43,9 @@ class GetNewMembershipNumberTest extends TestCase
      */
     public function does_client_set_access_token_header()
     {
+        $membershipNumbers = ['1234567'];
         $mock = new MockHandler([
-            new Response(200, [], json_encode(['membership_number' => '1234567']))
+            new Response(200, [], json_encode($membershipNumbers))
         ]);
         $handler = HandlerStack::create($mock);
 
@@ -52,9 +55,9 @@ class GetNewMembershipNumberTest extends TestCase
 
         $client = new Client(['handler' => $handler], $this->testConfig);
 
-        $client->getNewMembershipNumber();
+        $payload = ['limit' => 1];
+        $client->getNewBulkMembershipNumber($payload);
 
-        /** @var \GuzzleHttp\Psr7\Request $lastRequest */
         $lastRequest = end($container)['request'];
 
         $this->assertEquals('TEST_TOKEN', $lastRequest->getHeader('Access-Token')[0]);
@@ -72,12 +75,10 @@ class GetNewMembershipNumberTest extends TestCase
 
         $client = new Client(['handler' => $handler], $this->testConfig);
 
-        $this->setExpectedException(
-            '\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException',
-            'Unable to allocate membership number'
-        );
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException');
 
-        $client->getNewMembershipNumber();
+        $payload = ['limit' => 1];
+        $client->getNewBulkMembershipNumber($payload);
     }
 
     /**
@@ -94,7 +95,36 @@ class GetNewMembershipNumberTest extends TestCase
 
         $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException');
 
-        $client->getNewMembershipNumber();
+        $payload = ['limit' => 1];
+        $client->getNewBulkMembershipNumber($payload);
+    }
+
+    /**
+     * @test
+     */
+    public function does_client_handle_422_error()
+    {
+        $mock = new MockHandler([
+            new Response(422)
+        ]);
+        $handler = HandlerStack::create($mock);
+
+        $client = new Client(['handler' => $handler], $this->testConfig);
+
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException');
+
+        $payload = ['limit' => -1];
+        $client->getNewBulkMembershipNumber($payload);
+
+        $payload = ['limit' => 0];
+        $client->getNewBulkMembershipNumber($payload);
+
+        $payload = ['limit' => null];
+        $client->getNewBulkMembershipNumber($payload);
+
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException');
+        $payload = [];
+        $client->getNewBulkMembershipNumber($payload);
     }
 
     /**
