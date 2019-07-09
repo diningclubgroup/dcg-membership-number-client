@@ -2,10 +2,10 @@
 
 use Dcg\Client\MembershipNumber\Client;
 use Dcg\Client\MembershipNumber\Config;
-use GuzzleHttp\Message\Response;
-use GuzzleHttp\Stream\Stream;
-use GuzzleHttp\Subscriber\History;
-use GuzzleHttp\Subscriber\Mock;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
 class GetNewBulkMembershipNumberTest extends TestCase
@@ -24,38 +24,43 @@ class GetNewBulkMembershipNumberTest extends TestCase
     /**
      * @test
      */
-    public function does_client_return_membership_number()
+    public function does_client_return_membership_numbers()
     {
-        $mock = new Mock([
-            new Response(200, [], Stream::factory(json_encode(['1234567'])))
+        $membershipNumbers = ['1234567'];
+        $mock = new MockHandler([
+            new Response(200, [], json_encode($membershipNumbers))
         ]);
+        $handler = HandlerStack::create($mock);
 
-        $client = new Client([], $this->testConfig);
+        $client = new Client(['handler' => $handler], $this->testConfig);
 
-        $client->getEmitter()->attach($mock);
-        $limit = ['limit' => 1];
-        $this->assertEquals('1234567', $client->getNewBulkMembershipNumber($limit));
+        $payload = ['limit' => 1];
+        $this->assertEquals($membershipNumbers, $client->getNewBulkMembershipNumber($payload));
     }
 
+    /**
+     * @test
+     */
     public function does_client_set_access_token_header()
     {
-        $mock = new Mock([
-            new Response(200, [], Stream::factory(json_encode(['1234567'])))
+        $membershipNumbers = ['1234567'];
+        $mock = new MockHandler([
+            new Response(200, [], json_encode($membershipNumbers))
         ]);
+        $handler = HandlerStack::create($mock);
 
-        $history = new History();
+        $container = [];
+        $history = Middleware::history($container);
+        $handler->push($history);
 
-        $client = new Client([], $this->testConfig);
+        $client = new Client(['handler' => $handler], $this->testConfig);
 
-        $client->getEmitter()->attach($mock);
-        $client->getEmitter()->attach($history);
+        $payload = ['limit' => 1];
+        $client->getNewBulkMembershipNumber($payload);
 
-        $limit = ['limit' => 1];
-        $client->getNewBulkMembershipNumber($limit);
+        $lastRequest = end($container)['request'];
 
-        $lastRequest = $history->getLastRequest();
-
-        $this->assertEquals('TEST_TOKEN', $lastRequest->getHeader('Access-Token'));
+        $this->assertEquals('TEST_TOKEN', $lastRequest->getHeader('Access-Token')[0]);
     }
 
     /**
@@ -63,18 +68,17 @@ class GetNewBulkMembershipNumberTest extends TestCase
      */
     public function does_client_handle_404_error()
     {
-        $mock = new Mock([
-            new Response(404, [], Stream::factory(json_encode(['error' => 'Unable to allocate membership number'])))
+        $mock = new MockHandler([
+            new Response(404, [], json_encode(['error' => 'Unable to allocate membership number']))
         ]);
+        $handler = HandlerStack::create($mock);
 
-        $client = new Client([], $this->testConfig);
+        $client = new Client(['handler' => $handler], $this->testConfig);
 
-        $client->getEmitter()->attach($mock);
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException');
 
-        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Unable to allocate membership number');
-
-        $limit = ['limit' => 1];
-        $client->getNewBulkMembershipNumber($limit);
+        $payload = ['limit' => 1];
+        $client->getNewBulkMembershipNumber($payload);
     }
 
     /**
@@ -82,18 +86,17 @@ class GetNewBulkMembershipNumberTest extends TestCase
      */
     public function does_client_handle_500_error()
     {
-        $mock = new Mock([
+        $mock = new MockHandler([
             new Response(500)
         ]);
+        $handler = HandlerStack::create($mock);
 
-        $client = new Client([], $this->testConfig);
+        $client = new Client(['handler' => $handler], $this->testConfig);
 
-        $client->getEmitter()->attach($mock);
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException');
 
-        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'There was an error while contacting Membership Number Service. Response code : 500');
-
-        $limit = ['limit' => 1];
-        $client->getNewBulkMembershipNumber($limit);
+        $payload = ['limit' => 1];
+        $client->getNewBulkMembershipNumber($payload);
     }
 
     /**
@@ -101,28 +104,27 @@ class GetNewBulkMembershipNumberTest extends TestCase
      */
     public function does_client_handle_422_error()
     {
-        $mock = new Mock([
+        $mock = new MockHandler([
             new Response(422)
         ]);
+        $handler = HandlerStack::create($mock);
 
-        $client = new Client([], $this->testConfig);
+        $client = new Client(['handler' => $handler], $this->testConfig);
 
-        $client->getEmitter()->attach($mock);
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException');
 
-        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Limit should contain valid integer. Response code : 422');
+        $payload = ['limit' => -1];
+        $client->getNewBulkMembershipNumber($payload);
 
-        $limit = ['limit' => -1];
-        $client->getNewBulkMembershipNumber($limit);
+        $payload = ['limit' => 0];
+        $client->getNewBulkMembershipNumber($payload);
 
-        $limit = ['limit' => 0];
-        $client->getNewBulkMembershipNumber($limit);
+        $payload = ['limit' => null];
+        $client->getNewBulkMembershipNumber($payload);
 
-        $limit = ['limit' => null];
-        $client->getNewBulkMembershipNumber($limit);
-
-        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException', 'Limit is null. Response code : 422');
-        $limit = [];
-        $client->getNewBulkMembershipNumber($limit);
+        $this->setExpectedException('\\Dcg\\Client\\MembershipNumber\\Exception\\MembershipNumberException');
+        $payload = [];
+        $client->getNewBulkMembershipNumber($payload);
     }
 
     /**

@@ -6,7 +6,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Stream\Stream;
 use PHPUnit\Framework\TestCase;
 
 class GetNewMembershipNumberTest extends TestCase
@@ -28,7 +27,7 @@ class GetNewMembershipNumberTest extends TestCase
     public function does_client_return_membership_number()
     {
         $mock = new MockHandler([
-            new Response(200, [], Stream::factory(json_encode(['membership_number' => '1234567'])))
+            new Response(200, [], json_encode(['membership_number' => '1234567']))
         ]);
         $handler = HandlerStack::create($mock);
 
@@ -37,10 +36,13 @@ class GetNewMembershipNumberTest extends TestCase
         $this->assertEquals('1234567', $client->getNewMembershipNumber());
     }
 
+    /**
+     * @test
+     */
     public function does_client_set_access_token_header()
     {
         $mock = new MockHandler([
-            new Response(200, [], Stream::factory(json_encode(['membership_number' => '1234567'])))
+            new Response(200, [], json_encode(['membership_number' => '1234567']))
         ]);
         $handler = HandlerStack::create($mock);
 
@@ -52,9 +54,10 @@ class GetNewMembershipNumberTest extends TestCase
 
         $client->getNewMembershipNumber();
 
-        $lastRequest = end($container);
+        /** @var \GuzzleHttp\Psr7\Request $lastRequest */
+        $lastRequest = end($container)['request'];
 
-        $this->assertEquals('TEST_TOKEN', $lastRequest->getHeader('Access-Token'));
+        $this->assertEquals('TEST_TOKEN', $lastRequest->getHeader('Access-Token')[0]);
     }
 
     /**
@@ -63,7 +66,7 @@ class GetNewMembershipNumberTest extends TestCase
     public function does_client_handle_404_error()
     {
         $mock = new MockHandler([
-            new Response(404, [], Stream::factory(json_encode(['error' => 'Unable to allocate membership number'])))
+            new Response(404, [], json_encode(['error' => 'Unable to allocate membership number']))
         ]);
         $handler = HandlerStack::create($mock);
 
